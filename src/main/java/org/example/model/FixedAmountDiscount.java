@@ -2,9 +2,6 @@ package org.example.model;
 
 public class FixedAmountDiscount  extends  Discount{
 
-    // TODO
-
-
     private final double amount;
     public FixedAmountDiscount(String code,double amount){
 
