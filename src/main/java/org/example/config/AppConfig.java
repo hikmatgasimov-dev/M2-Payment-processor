@@ -15,8 +15,11 @@ public class AppConfig {
     }
 
     public static AppConfig getInstance(){
-        // TODO
-        return null;
+         //object is created only once,on the first call
+        if(instance==null){
+            instance=new AppConfig();
+        }
+        return instance;
     }
 
     public String getApplicationName() {
