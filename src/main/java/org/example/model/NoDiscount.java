@@ -4,9 +4,12 @@ public class NoDiscount extends Discount {
     public NoDiscount() {
         super("NONE");
     }
+
+
     @Override
     public double apply(double originalAmount) {
         // TODO
-        return 0;
+        //price stays same ,no discount
+        return originalAmount;
     }
 }
