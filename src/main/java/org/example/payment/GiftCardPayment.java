@@ -25,6 +25,6 @@ public class GiftCardPayment extends PaymentMethod{
         }
         balance-=amount;
 
-        return new PaymentResult(true, "Paid " + String.format("%.2f", amount) + " using gift card. Balance left: " + String.format("%.2f", balance));;
+        return new PaymentResult(true, "Paid " + String.format("%.2f", amount) + " using gift card. Balance left: " + String.format("%.2f", balance));
     }
 }
