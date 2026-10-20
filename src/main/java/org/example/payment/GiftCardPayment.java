@@ -21,7 +21,7 @@ public class GiftCardPayment extends PaymentMethod{
         }
 
         if(amount>balance){
-            return new PaymentResult(false,"Not enough balance on the gift card.Avaliable" +String.format("%.2f",balance));
+            return new PaymentResult(false, "Not enough balance on the gift card. Available: " + String.format("%.2f", balance));
         }
         balance-=amount;
 
