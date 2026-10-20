@@ -6,24 +6,36 @@ public class OrderItem {
     private final int quantity;
 
     public OrderItem(String name, double price, int quantity) {
-
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Item name must not be empty");
+        }
+        if (price <= 0) {
+            throw new IllegalArgumentException("Price must be greater than zero");
+        }
         if (quantity <= 0) {
-
             throw new IllegalArgumentException("Quantity must be greater than zero");
         }
-
-        this.name = name;
+        this.name = name.trim();
         this.price = price;
         this.quantity = quantity;
     }
 
-    public double calculateTotal() {
+    public double calculateTotal(){
         return price * quantity;
     }
 
+    public String getName() {
+        return name;
+    }
+    public double getPrice() {
+        return price;
+    }
+    public int getQuantity() {
+        return quantity;
+    }
 
     @Override
-    public String toString() {
+    public String toString(){
         return name + " x" + quantity + " = " + String.format("%.2f", calculateTotal());
     }
 }
