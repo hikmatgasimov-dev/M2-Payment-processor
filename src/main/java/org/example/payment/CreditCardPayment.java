@@ -14,7 +14,26 @@ public class CreditCardPayment extends PaymentMethod {
 
     @Override
     public PaymentResult processPayment(double amount) {
-        // TODO: add basic validations
-        return new PaymentResult(true, "Paid " + amount + " using credit card ending with " + cardNumber.substring(cardNumber.length() - 4));
+        if (cardHolderName == null || cardHolderName.isBlank()) {
+
+            return new PaymentResult(false, "Card holder must not be empty");
+        }
+        if (cardNumber == null) {
+            return new PaymentResult(false, "Card number must not be empty");
+        }
+        // spaces are allowed in the input
+        String digits = cardNumber.replace(" ", "");
+        if (digits.length() != 16) {
+
+            return new PaymentResult(false, "Card number must have 16 digits");
+        }
+        for(int i=0;i<digits.length();i++){
+
+            if(!Character.isDigit(digits.charAt(i))){
+                return new PaymentResult(false, "Card number must contain digits");
+            }
+        }
+
+        return new PaymentResult(true, "Paid " + amount + " using credit card ending with " + digits.substring(12));
     }
 }
