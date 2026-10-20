@@ -24,15 +24,18 @@ public class ConsoleMenu {
         while(running){
             printMenu();
 
-            int option = Integer.parseInt(scanner.nextLine());
+            int option = readInt("Choose an option:");
 
             switch (option){
                 case 1 -> createOrder();
                 case 2 -> addItem();
                 case 3 -> viewOrder();
                 case 4 -> payOrder();
-                case 0 -> running = false;
-                default -> System.out.println("Invalid option");
+                case 0 -> {
+                    System.out.println("Goodbye!");
+                    running = false;
+                }
+                default -> System.out.println("Invalid option, please choose 0-4.");
             }
         }
     }
@@ -41,30 +44,42 @@ public class ConsoleMenu {
         System.out.println("Customer name:");
         String customerName = scanner.nextLine();
 
-        currentOrder = Order.builder()
-                .customerName(customerName)
-                .build();
-        System.out.println("Order created for " + customerName);
+        try {
+            currentOrder = Order.builder()
+                    .customerName(customerName)
+                    .build();
+            System.out.println("Order created for " + currentOrder.getCustomerName());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Could not create order: " + e.getMessage());
+        }
     }
 
     private void addItem(){
-        // TODO: check if order exists
+        if (currentOrder == null) {
+            System.out.println("Create an order first.");
+            return;
+        }
 
         System.out.println("Item name:");
         String itemName = scanner.nextLine();
 
-        System.out.println("Price:");
-        double price = Double.parseDouble(scanner.nextLine());
+        double price = readDouble("Price:");
+        int quantity = readInt("Quantity:");
 
-        System.out.println("Quantity:");
-        int quantity = Integer.parseInt(scanner.nextLine());
-
-        currentOrder.addItem(new OrderItem(itemName, price, quantity));
-        System.out.println("Item added to order");
+        try {
+            currentOrder.addItem(new OrderItem(itemName, price, quantity));
+            System.out.println("Item added to order");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println("Could not add item: " + e.getMessage());
+        }
     }
 
     private void viewOrder(){
-        // TODO: check if order exists
+        if (currentOrder == null) {
+            System.out.println("Create an order first.");
+            return;
+        }
+
 
         System.out.println("Customer: " + currentOrder.getCustomerName());
         System.out.println("Status: " +  currentOrder.getStatus());
@@ -78,7 +93,10 @@ public class ConsoleMenu {
     }
 
     private void payOrder(){
-        // TODO: check if order exists
+        if (currentOrder == null) {
+            System.out.println("Create an order first.");
+            return;
+        }
 
         System.out.println("""
                 Select payment method:
@@ -86,14 +104,20 @@ public class ConsoleMenu {
                 2. PayPal
                 3. Gift Card
                 """);
-        int option = Integer.parseInt(scanner.nextLine());
+        int option = readInt("Payment method:");
 
-        PaymentMethod paymentMethod = switch(option){
-            case 1 -> createCreditCardPayment();
-            case 2 -> createPaypalPayment();
-            case 3 -> createGiftCardPayment();
-            default -> throw new IllegalArgumentException("Invalid payment method");
-        };
+        PaymentMethod paymentMethod;
+        try {
+            paymentMethod = switch(option){
+                case 1 -> createCreditCardPayment();
+                case 2 -> createPaypalPayment();
+                case 3 -> createGiftCardPayment();
+                default -> throw new IllegalArgumentException("Invalid payment method");
+            };
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
 
         PaymentResult result = paymentProcessor.process(currentOrder, paymentMethod);
         System.out.println(result.getMessage());
@@ -110,14 +134,43 @@ public class ConsoleMenu {
     }
 
     private  PaymentMethod createPaypalPayment(){
-        // TODO
-        return null;
+        System.out.println("PayPal email:");
+        String email = scanner.nextLine();
+
+        return PaymentMethodFactory.createPaypalPayment(email);
     }
 
     private PaymentMethod createGiftCardPayment(){
-        // TODO
-        return null;
+        System.out.println("Gift card code:");
+        String code = scanner.nextLine();
+
+        double balance = readDouble("Gift card balance:");
+
+        return PaymentMethodFactory.createGiftCardPayment(code, balance);
     }
+    // asks again until the user types a whole number
+    private int readInt(String prompt){
+        while (true) {
+            System.out.println(prompt);
+            try {
+                return Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a whole number.");
+            }
+        }
+    }
+    // asks again until the user types a number
+    private double readDouble(String prompt){
+        while (true) {
+            System.out.println(prompt);
+            try {
+                return Double.parseDouble(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number, for example 12.5");
+            }
+        }
+    }
+
 
     private void printMenu(){
         System.out.println("""
